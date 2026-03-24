@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">Search</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell">
+  <div th:replace="fragments/nav :: topbar"></div>
+  <div class="app-layout">
+    <div th:replace="fragments/nav :: sidebar"></div>
+    <main class="content-shell container-fluid">
+      <div class="page-card p-4 mb-4">
+        <h1 class="h4 mb-2">Global Search</h1>
+        <p class="text-muted mb-0" th:text="${query != null ? ('Results for ' + query) : 'Search across all databases and tables.'}">Search across all databases and tables.</p>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead><tr><th>Database</th><th>Table</th><th>Preview</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr th:each="result : ${results}">
+                <td th:text="${result.databaseName}">amayezi</td>
+                <td th:text="${result.tableName}">customers</td>
+                <td th:text="${result.preview}">id=1 | name=John</td>
+                <td><a class="btn btn-sm btn-outline-primary" th:href="@{'/databases/' + ${result.connectionId} + '/tables/' + ${result.tableName}}">Open</a></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(results)}"><td colspan="4" class="text-center text-muted py-4">No matching records found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div th:replace="fragments/nav :: footer"></div>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

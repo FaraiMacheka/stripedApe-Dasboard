@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">Databases</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell">
+  <div th:replace="fragments/nav :: topbar"></div>
+  <div class="app-layout">
+    <div th:replace="fragments/nav :: sidebar"></div>
+    <main class="content-shell container-fluid">
+      <div class="page-card p-4 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h1 class="h4 mb-1">Databases</h1>
+          <p class="text-muted mb-0">Add, test, and manage PostgreSQL connections.</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/databases/new}"><i class="bi bi-plus-lg me-2"></i>Add database</a>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead><tr><th>Name</th><th>JDBC URL</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr th:each="db : ${databases}">
+                <td class="fw-semibold" th:text="${db.name}">amayezi</td>
+                <td class="text-truncate" style="max-width: 420px;" th:text="${db.jdbcUrl}">jdbc:postgresql://localhost...</td>
+                <td><span class="badge badge-soft" th:text="${db.active ? 'Active' : 'Inactive'}">Active</span></td>
+                <td class="d-flex flex-wrap gap-2">
+                  <a class="btn btn-sm btn-outline-primary" th:href="@{'/databases/' + ${db.id} + '/tables'}">Open</a>
+                  <a class="btn btn-sm btn-outline-secondary" th:href="@{'/databases/' + ${db.id} + '/edit'}">Edit</a>
+                  <form th:action="@{'/databases/' + ${db.id} + '/delete'}" method="post" onsubmit="return confirm('Delete this database connection?')">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(databases)}"><td colspan="4" class="text-center text-muted py-4">No database connections configured yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div th:replace="fragments/nav :: footer"></div>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

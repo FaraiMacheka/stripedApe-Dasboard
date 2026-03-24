@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">Database Form</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell">
+  <div th:replace="fragments/nav :: topbar"></div>
+  <div class="app-layout">
+    <div th:replace="fragments/nav :: sidebar"></div>
+    <main class="content-shell container-fluid">
+      <div class="page-card p-4">
+        <div class="mb-4">
+          <h1 class="h4 mb-1" th:text="${form.id == null ? 'Add database' : 'Edit database'}">Add database</h1>
+          <p class="text-muted mb-0">Store a PostgreSQL connection that can be browsed by the generic CRUD layer.</p>
+        </div>
+        <form th:action="@{/databases}" th:object="${form}" method="post" class="row g-3">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <input type="hidden" th:field="*{id}"/>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Name</label>
+            <input class="form-control" th:field="*{name}" placeholder="amayezi" required/>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">JDBC URL</label>
+            <input class="form-control" th:field="*{jdbcUrl}" placeholder="jdbc:postgresql://localhost:5432/mydb?currentSchema=public" required/>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Username</label>
+            <input class="form-control" th:field="*{username}" placeholder="postgres" required/>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Password</label>
+            <input class="form-control" type="password" th:field="*{password}" placeholder="Leave blank to keep current password"/>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Description</label>
+            <input class="form-control" th:field="*{description}" placeholder="Optional note"/>
+          </div>
+          <div class="col-12 col-lg-6 d-flex align-items-end">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" th:field="*{active}"/>
+              <label class="form-check-label">Active</label>
+            </div>
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-outline-secondary" th:href="@{/databases}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+  <div th:replace="fragments/nav :: footer"></div>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

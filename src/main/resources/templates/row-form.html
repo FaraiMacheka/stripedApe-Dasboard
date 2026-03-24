@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">Row form</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell">
+  <div th:replace="fragments/nav :: topbar"></div>
+  <div class="app-layout">
+    <div th:replace="fragments/nav :: sidebar"></div>
+    <main class="content-shell container-fluid">
+      <div class="page-card p-4">
+        <h1 class="h4 mb-1" th:text="${rowId == '' ? 'Add row' : 'Edit row'}">Add row</h1>
+        <p class="text-muted mb-4" th:text="${details.schema + '.' + details.tableName}">public.users</p>
+        <form th:action="@{'/databases/' + ${connection.id} + '/tables/' + ${tableName}}" method="post" class="row g-3">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <input type="hidden" name="rowId" th:value="${rowId}"/>
+          <div class="col-12" th:each="field : ${form.fields}">
+            <label class="form-label" th:for="${field.name}" th:text="${field.label}">Field</label>
+            <input type="hidden" th:if="${field.readOnly}" th:name="${field.name}" th:value="${field.value}"/>
+            <input th:if="${field.inputType != 'checkbox'}" class="form-control" th:id="${field.name}" th:name="${field.name}" th:type="${field.inputType == 'datetime-local' ? 'datetime-local' : field.inputType}" th:value="${field.value}" th:readonly="${field.readOnly}"/>
+            <div th:if="${field.inputType == 'checkbox'}" class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" th:id="${field.name}" th:name="${field.name}" th:checked="${field.checked()}" th:disabled="${field.readOnly}"/>
+            </div>
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-outline-secondary" th:href="@{'/databases/' + ${connection.id} + '/tables/' + ${tableName}}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+  <div th:replace="fragments/nav :: footer"></div>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

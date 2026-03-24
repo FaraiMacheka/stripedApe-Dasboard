@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">Tables</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell">
+  <div th:replace="fragments/nav :: topbar"></div>
+  <div class="app-layout">
+    <div th:replace="fragments/nav :: sidebar"></div>
+    <main class="content-shell container-fluid">
+      <div class="page-card p-4 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h1 class="h4 mb-1" th:text="${connection.name}">amayezi</h1>
+          <p class="text-muted mb-0">Tables available in this database.</p>
+        </div>
+        <a class="btn btn-outline-secondary" th:href="@{/databases}">Back to databases</a>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead><tr><th>Table</th><th>Rows</th><th>Remarks</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr th:each="table : ${tables}">
+                <td class="fw-semibold" th:text="${table.schemaName + '.' + table.tableName}">public.users</td>
+                <td><span class="badge badge-soft" th:text="${table.rowCount}">0</span></td>
+                <td th:text="${table.remarks}">Remark</td>
+                <td><a class="btn btn-sm btn-outline-primary" th:href="@{'/databases/' + ${connection.id} + '/tables/' + ${table.schemaName + '.' + table.tableName}}">Open</a></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(tables)}"><td colspan="4" class="text-center text-muted py-4">No tables found in this database.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div th:replace="fragments/nav :: footer"></div>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

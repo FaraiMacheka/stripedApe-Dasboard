@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="topbar" class="topbar navbar navbar-expand-lg border-bottom">
+  <div class="container-fluid gap-3">
+    <a class="brand" th:href="@{/dashboard}">
+      <span class="brand-mark">SA</span>
+      <span th:text="${appName}">stripedApe-Dasboard</span>
+    </a>
+    <form class="flex-grow-1 d-none d-lg-flex search-shell" th:action="@{/search}" method="get">
+      <i class="bi bi-search"></i>
+      <input class="form-control border-0 shadow-none" type="search" name="q" placeholder="Search records, tables, or database rows"/>
+    </form>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <button type="button" class="btn btn-ghost" id="themeToggle" aria-label="Toggle theme">
+        <i class="bi bi-moon-stars"></i>
+      </button>
+      <button type="button" class="btn btn-ghost position-relative" aria-label="Notifications">
+        <i class="bi bi-bell"></i>
+        <span class="notification-dot"></span>
+      </button>
+      <div class="dropdown">
+        <button class="btn btn-ghost dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown" type="button">
+          <span class="avatar" th:text="${#strings.substring(currentPrincipal,0,1)}">A</span>
+          <span class="d-none d-md-inline" th:text="${currentPrincipal}">admin</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+          <li><a class="dropdown-item" th:href="@{/profile}">Profile</a></li>
+          <li><a class="dropdown-item" th:href="@{/settings}">Settings</a></li>
+          <li><hr class="dropdown-divider"/></li>
+          <li><form th:action="@{/logout}" method="post" class="px-3 py-1"><button class="btn btn-link p-0 text-decoration-none" type="submit">Logout</button></form></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<aside th:fragment="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+    <nav class="nav flex-column gap-1">
+      <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-grid"></i><span>Dashboard</span></a>
+      <a class="nav-link" th:href="@{/databases}"><i class="bi bi-database"></i><span>Databases</span></a>
+      <a class="nav-link" th:href="@{/users}"><i class="bi bi-people"></i><span>Users</span></a>
+      <a class="nav-link" th:href="@{/search}"><i class="bi bi-search"></i><span>Reports / Analytics</span></a>
+      <a class="nav-link" th:href="@{/settings}"><i class="bi bi-gear"></i><span>Settings</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <small>Version 0.1.0</small>
+      <a th:href="${whatsappLink}" target="_blank" rel="noopener" class="text-decoration-none">A product of <strong th:text="${whatsappLabel}">stripedApe</strong></a>
+    </div>
+  </div>
+</aside>
+
+<footer th:fragment="footer" class="app-footer">
+  <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span>© stripedApe</span>
+    <a th:href="${whatsappLink}" target="_blank" rel="noopener">Chat on WhatsApp +27 69 693 5713</a>
+  </div>
+</footer>
+</body>
+</html>

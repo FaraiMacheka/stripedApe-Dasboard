@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">stripedApe-Dasboard</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell login-shell d-flex align-items-center">
+  <main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+        <div class="page-card p-4 p-md-5 login-card">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="brand-mark">SA</div>
+            <div>
+              <h1 class="h3 mb-1" th:text="${appName}">stripedApe-Dasboard</h1>
+              <p class="text-muted mb-0">Sign in to manage databases, tables, and RBAC.</p>
+            </div>
+          </div>
+          <div th:if="${param.error}" class="alert alert-danger">Invalid username or password.</div>
+          <div th:if="${param.logout}" class="alert alert-success">You have been signed out.</div>
+          <form th:action="@{/login}" method="post" class="row g-3">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="col-12">
+              <label class="form-label">Username</label>
+              <input class="form-control form-control-lg" type="text" name="username" placeholder="admin" autofocus/>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Password</label>
+              <input class="form-control form-control-lg" type="password" name="password" placeholder="Admin@1234!"/>
+            </div>
+            <div class="col-12 d-grid">
+              <button class="btn btn-primary btn-lg" type="submit">Sign in</button>
+            </div>
+          </form>
+          <p class="small text-muted mt-4 mb-0">Default accounts: admin, manager, viewer.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/stripedape-admin;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  thymeleaf:
+    cache: false
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+server:
+  port: 8090
+  error:
+    include-message: always
+app:
+  name: stripedApe-Dasboard
+  encryption-key: stripedape-dev-key
+  bootstrap-users:
+    admin-username: admin
+    admin-password: Admin@1234!
+    manager-username: manager
+    manager-password: Manager@1234!
+    viewer-username: viewer
+    viewer-password: Viewer@1234!
+  seed-databases:
+    - name: amayezi
+      jdbc-url: jdbc:postgresql://localhost:5432/amayezi?schema=public
+      username: postgres
+      password: eX2j984qQSt837nfw
+      active: true
+    - name: fundisaflow
+      jdbc-url: jdbc:postgresql://localhost:5432/fundisaflow?schema=public
+      username: postgres
+      password: eX2j984qQSt837nfw
+      active: true
+    - name: fixdesk
+      jdbc-url: jdbc:postgresql://localhost:5432/fixdesk?schema=public
+      username: postgres
+      password: eX2j984qQSt837nfw
+      active: true
+    - name: ukuqokelela
+      jdbc-url: jdbc:postgresql://localhost:5432/ukuqokelela?schema=public
+      username: postgres
+      password: eX2j984qQSt837nfw
+      active: true
+

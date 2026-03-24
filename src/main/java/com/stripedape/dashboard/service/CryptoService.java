@@ -1,0 +1,74 @@
+package com.stripedape.dashboard.service;
+
+import com.stripedape.dashboard.config.AppProperties;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CryptoService {
+
+    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final int IV_LENGTH = 12;
+    private static final int TAG_LENGTH_BITS = 128;
+    private final SecretKey key;
+
+    public CryptoService(AppProperties properties) {
+        this.key = deriveKey(properties.getEncryptionKey());
+    }
+
+    public String encrypt(String plainText) {
+        if (plainText == null || plainText.isBlank()) {
+            return "";
+        }
+        try {
+            byte[] iv = new byte[IV_LENGTH];
+            new SecureRandom().nextBytes(iv);
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(TAG_LENGTH_BITS, iv));
+            byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+            byte[] payload = new byte[iv.length + encrypted.length];
+            System.arraycopy(iv, 0, payload, 0, iv.length);
+            System.arraycopy(encrypted, 0, payload, iv.length, encrypted.length);
+            return java.util.Base64.getEncoder().encodeToString(payload);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to encrypt secret", ex);
+        }
+    }
+
+    public String decrypt(String encoded) {
+        if (encoded == null || encoded.isBlank()) {
+            return "";
+        }
+        try {
+            byte[] payload = java.util.Base64.getDecoder().decode(encoded);
+            byte[] iv = new byte[IV_LENGTH];
+            byte[] encrypted = new byte[payload.length - IV_LENGTH];
+            System.arraycopy(payload, 0, iv, 0, IV_LENGTH);
+            System.arraycopy(payload, IV_LENGTH, encrypted, 0, encrypted.length);
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(TAG_LENGTH_BITS, iv));
+            return new String(cipher.doFinal(encrypted), StandardCharsets.UTF_8);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to decrypt secret", ex);
+        }
+    }
+
+    private SecretKey deriveKey(String secret) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = digest.digest(secret.getBytes(StandardCharsets.UTF_8));
+            byte[] keyBytes = new byte[16];
+            System.arraycopy(bytes, 0, keyBytes, 0, 16);
+            return new SecretKeySpec(keyBytes, "AES");
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to derive encryption key", ex);
+        }
+    }
+}
+
