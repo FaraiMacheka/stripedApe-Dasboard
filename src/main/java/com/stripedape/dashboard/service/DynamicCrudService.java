@@ -35,8 +35,8 @@ public class DynamicCrudService {
     }
 
     public List<TableSummary> listTables(Long connectionId) {
-        try {
-            DatabaseMetaData metaData = jdbcTemplate(connectionId).getDataSource().getConnection().getMetaData();
+        try (java.sql.Connection connection = jdbcTemplate(connectionId).getDataSource().getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
             List<TableSummary> tables = new ArrayList<>();
             try (ResultSet rs = metaData.getTables(null, null, "%", new String[]{"TABLE"})) {
                 while (rs.next()) {
@@ -58,8 +58,8 @@ public class DynamicCrudService {
     }
 
     public TableDetails describeTable(Long connectionId, String tableName) {
-        try {
-            DatabaseMetaData metaData = jdbcTemplate(connectionId).getDataSource().getConnection().getMetaData();
+        try (java.sql.Connection connection = jdbcTemplate(connectionId).getDataSource().getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
             TableRef tableRef = resolve(metaData, tableName);
             List<ColumnDetails> columns = new ArrayList<>();
             try (ResultSet rs = metaData.getColumns(null, tableRef.schema, tableRef.name, "%")) {
@@ -272,8 +272,12 @@ public class DynamicCrudService {
     }
 
     private String resolveSortColumn(TableDetails details, String requested) {
-        if (StringUtils.hasText(requested) && details.columns().stream().anyMatch(col -> col.name().equalsIgnoreCase(requested))) {
-            return requested;
+        if (StringUtils.hasText(requested)) {
+            return details.columns().stream()
+                    .map(ColumnDetails::name)
+                    .filter(name -> name.equalsIgnoreCase(requested))
+                    .findFirst()
+                    .orElseGet(() -> details.primaryKeys().isEmpty() ? (details.columns().isEmpty() ? "1" : details.columns().get(0).name()) : details.primaryKeys().get(0));
         }
         if (!details.primaryKeys().isEmpty()) {
             return details.primaryKeys().get(0);

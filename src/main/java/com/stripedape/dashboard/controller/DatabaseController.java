@@ -114,7 +114,9 @@ public class DatabaseController {
     @GetMapping("/{id}/tables/{tableName}/new")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public String newRow(@PathVariable Long id, @PathVariable String tableName, Model model) {
+        var details = crudService.describeTable(id, tableName);
         model.addAttribute("connection", databaseAdminService.getRequired(id));
+        model.addAttribute("details", details);
         model.addAttribute("tableName", tableName);
         model.addAttribute("form", crudService.buildRowForm(id, tableName, null));
         model.addAttribute("rowId", "");
@@ -125,7 +127,9 @@ public class DatabaseController {
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public String editRow(@PathVariable Long id, @PathVariable String tableName, @PathVariable String rowId, Model model) {
         Map<String, Object> existing = crudService.fetchRow(id, tableName, rowId);
+        var details = crudService.describeTable(id, tableName);
         model.addAttribute("connection", databaseAdminService.getRequired(id));
+        model.addAttribute("details", details);
         model.addAttribute("tableName", tableName);
         model.addAttribute("form", crudService.buildRowForm(id, tableName, existing));
         model.addAttribute("rowId", rowId);
@@ -150,6 +154,7 @@ public class DatabaseController {
         return "redirect:/databases/" + id + "/tables/" + tableName;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @GetMapping(value = "/{id}/tables/{tableName}/export", produces = "text/csv")
     public org.springframework.http.ResponseEntity<byte[]> exportCsv(
             @PathVariable Long id,
