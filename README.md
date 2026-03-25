@@ -2,6 +2,10 @@
 
 Spring Boot dashboard for browsing and managing multiple PostgreSQL databases with RBAC, generic CRUD, and CSV export.
 
+## Requirements
+
+- Java 17
+
 ## Default logins
 
 - `admin` / `Admin@1234!`
@@ -29,8 +33,27 @@ The app seeds these PostgreSQL connections on startup:
 
 ## Run
 
-Use your local Gradle installation or IDE run configuration targeting StripedApeDashboardApplication.
-The app listens on port 8090.
+From PowerShell in the project root:
 
-If you want, I can add a Gradle wrapper next so the project boots with `./gradlew`.
+```powershell
+$env:JAVA_HOME='C:\Program Files\Java\jdk-17.0.12'
+$env:GRADLE_USER_HOME="$PWD\.gradle-home"
+.\gradlew.bat --no-daemon bootRun
+```
+
+The app listens on port `8090`.
+
+Open:
+
+- `http://localhost:8090/login`
+
+## Troubleshooting
+
+If startup fails with an H2 error like `The write format 1 is smaller than the supported format 2`, rename or delete the local H2 files and start again:
+
+```powershell
+Rename-Item .\data\stripedape-admin.mv.db stripedape-admin.mv.db.bak
+Rename-Item .\data\stripedape-admin.trace.db stripedape-admin.trace.db.bak
+.\gradlew.bat --no-daemon bootRun
+```
 
