@@ -9,6 +9,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,25 @@ public class AppPortsService {
         } catch (IOException ex) {
             return AppPortsSnapshot.missing(path.toString());
         }
+    }
+
+    public List<AppPortEntry> filterEntries(List<AppPortEntry> entries, String query) {
+        if (!StringUtils.hasText(query)) {
+            return entries;
+        }
+        String normalized = query.toLowerCase(Locale.ROOT);
+        return entries.stream()
+                .filter(entry -> contains(entry.app(), normalized)
+                        || contains(entry.stack(), normalized)
+                        || contains(entry.status(), normalized)
+                        || contains(entry.frontendPort(), normalized)
+                        || contains(entry.backendPort(), normalized)
+                        || contains(entry.notes(), normalized))
+                .toList();
+    }
+
+    private boolean contains(String value, String query) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(query);
     }
 
     private List<AppPortEntry> parseEntries(List<String> lines) {

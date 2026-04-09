@@ -29,6 +29,20 @@
         Could not load the app ports file. Check the configured path in <code>application.yml</code>.
       </div>
 
+      <form class="row g-2 mb-3" th:action="@{/app-ports}" method="get" th:if="${!appPorts.missing}">
+        <div class="col-12 col-lg-8">
+          <input class="form-control" type="search" name="q" th:value="${portsQuery}" placeholder="Search app names, stack, status, ports, or notes"/>
+        </div>
+        <div class="col-12 col-lg-4 d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Search</button>
+          <a class="btn btn-outline-secondary" th:href="@{/app-ports}">Clear</a>
+        </div>
+      </form>
+
+      <div class="d-flex justify-content-between align-items-center mb-3 small text-muted" th:if="${!appPorts.missing}">
+        <span>Showing <strong th:text="${filteredAppPortsCount}">0</strong> of <strong th:text="${appPortsCount}">0</strong> tracked apps</span>
+      </div>
+
       <div class="table-card" th:if="${!appPorts.missing}">
         <div class="table-responsive">
           <table class="table align-middle mb-0">
@@ -43,7 +57,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="entry : ${appPorts.entries}">
+              <tr th:each="entry : ${filteredAppPorts}">
                 <td>
                   <a th:if="${entry.url != null}" th:href="${entry.url}" target="_blank" rel="noopener" th:text="${entry.app}">Ausi</a>
                   <span th:unless="${entry.url != null}" th:text="${entry.app}">stripedApe-Dasboard</span>
@@ -54,6 +68,7 @@
                 <td th:text="${entry.backendPort}">-</td>
                 <td class="small text-muted port-notes" th:text="${entry.notes}">Notes</td>
               </tr>
+              <tr th:if="${#lists.isEmpty(filteredAppPorts)}"><td colspan="6" class="text-center text-muted py-4">No application ports matched your search.</td></tr>
             </tbody>
           </table>
         </div>

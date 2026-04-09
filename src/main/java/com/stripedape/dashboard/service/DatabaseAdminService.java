@@ -5,9 +5,11 @@ import com.stripedape.dashboard.domain.DatabaseConnection;
 import com.stripedape.dashboard.repository.DatabaseConnectionRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class DatabaseAdminService {
@@ -49,11 +51,17 @@ public class DatabaseAdminService {
     }
 
     public List<DatabaseConnection> listAll() {
-        return repository.findAll();
+        return repository.findAll().stream()
+                .sorted(java.util.Comparator.comparing(DatabaseConnection::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     public List<DatabaseConnection> listActive() {
         return repository.findAllByActiveTrueOrderByNameAsc();
+    }
+
+    public List<DatabaseConnection> listActiveFiltered(String query) {
+        return filterConnections(listActive(), query);
     }
 
     public List<DatabaseConnection> listAutoDiscovered() {
@@ -62,6 +70,23 @@ public class DatabaseAdminService {
 
     public DatabaseConnection getRequired(Long id) {
         return repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Database connection not found"));
+    }
+
+    public List<DatabaseConnection> filterConnections(List<DatabaseConnection> connections, String query) {
+        if (!StringUtils.hasText(query)) {
+            return connections;
+        }
+        String normalized = query.toLowerCase(Locale.ROOT);
+        return connections.stream()
+                .filter(connection -> contains(connection.getName(), normalized)
+                        || contains(connection.getJdbcUrl(), normalized)
+                        || contains(connection.getUsername(), normalized)
+                        || contains(connection.getDescription(), normalized))
+                .toList();
+    }
+
+    private boolean contains(String value, String query) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(query);
     }
 
     @Transactional
