@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${appName}">Application Ports</title>
+  <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="app-shell">
+  <div th:replace="fragments/nav :: topbar"></div>
+  <div class="app-layout">
+    <div th:replace="fragments/nav :: sidebar"></div>
+    <main class="content-shell container-fluid">
+      <div class="page-card p-4 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h1 class="h4 mb-1">Application Ports</h1>
+          <p class="text-muted mb-0">Full view of the externally maintained app ports registry.</p>
+        </div>
+        <div class="small text-muted text-end">
+          <div th:if="${appPorts.sourcePath != null}">Source: <span th:text="${appPorts.sourcePath}">C:\app-ports\app-ports.md</span></div>
+          <div th:if="${appPortsUpdatedAt != null}">Updated: <span th:text="${appPortsUpdatedAt}">2026-04-09 10:15:00</span></div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning mb-0" th:if="${appPorts.missing}">
+        Could not load the app ports file. Check the configured path in <code>application.yml</code>.
+      </div>
+
+      <div class="table-card" th:if="${!appPorts.missing}">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>App</th>
+                <th>Stack</th>
+                <th>Status</th>
+                <th>Frontend</th>
+                <th>Backend</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="entry : ${appPorts.entries}">
+                <td>
+                  <a th:if="${entry.url != null}" th:href="${entry.url}" target="_blank" rel="noopener" th:text="${entry.app}">Ausi</a>
+                  <span th:unless="${entry.url != null}" th:text="${entry.app}">stripedApe-Dasboard</span>
+                </td>
+                <td th:text="${entry.stack}">Spring Boot</td>
+                <td><span class="badge badge-soft" th:text="${entry.status}">Active</span></td>
+                <td th:text="${entry.frontendPort}">8090</td>
+                <td th:text="${entry.backendPort}">-</td>
+                <td class="small text-muted port-notes" th:text="${entry.notes}">Notes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div th:replace="fragments/nav :: footer"></div>
+  <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

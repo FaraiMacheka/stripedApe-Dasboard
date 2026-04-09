@@ -2,12 +2,19 @@ package com.stripedape.dashboard.controller;
 
 import com.stripedape.dashboard.domain.DatabaseConnection;
 import com.stripedape.dashboard.service.DatabaseAdminService;
+import com.stripedape.dashboard.service.DatabaseBackupService;
 import com.stripedape.dashboard.service.DatabaseConnectionForm;
+import com.stripedape.dashboard.service.DatabaseDiscoveryService;
 import com.stripedape.dashboard.service.DynamicCrudService;
 import com.stripedape.dashboard.service.DynamicCrudService.PagedRows;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/databases")
@@ -24,16 +32,52 @@ public class DatabaseController {
 
     private final DatabaseAdminService databaseAdminService;
     private final DynamicCrudService crudService;
+    private final DatabaseDiscoveryService discoveryService;
+    private final DatabaseBackupService backupService;
 
-    public DatabaseController(DatabaseAdminService databaseAdminService, DynamicCrudService crudService) {
+    public DatabaseController(
+            DatabaseAdminService databaseAdminService,
+            DynamicCrudService crudService,
+            DatabaseDiscoveryService discoveryService,
+            DatabaseBackupService backupService
+    ) {
         this.databaseAdminService = databaseAdminService;
         this.crudService = crudService;
+        this.discoveryService = discoveryService;
+        this.backupService = backupService;
     }
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("databases", databaseAdminService.listAll());
+        List<DatabaseConnection> databases = databaseAdminService.listAll();
+        model.addAttribute("databases", databases);
+        model.addAttribute("discoveredCount", databases.stream().filter(DatabaseConnection::isAutoDiscovered).count());
         return "databases";
+    }
+
+    @PostMapping("/discover")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String discover(RedirectAttributes redirectAttributes) {
+        DatabaseDiscoveryService.DiscoverySummary summary = discoveryService.discoverNow();
+        StringBuilder message = new StringBuilder("Discovery completed. Scanned ")
+                .append(summary.scannedSources())
+                .append(" source connection(s).");
+        if (summary.discoveredCount() > 0) {
+            message.append(" Added ")
+                    .append(summary.discoveredCount())
+                    .append(" new database(s): ")
+                    .append(String.join(", ", summary.newlyAdded()))
+                    .append('.');
+        } else {
+            message.append(" No new databases were found.");
+        }
+        if (!summary.failedSources().isEmpty()) {
+            message.append(" Some sources could not be scanned: ")
+                    .append(String.join(", ", summary.failedSources()))
+                    .append('.');
+        }
+        redirectAttributes.addFlashAttribute("message", message.toString());
+        return "redirect:/databases";
     }
 
     @GetMapping("/new")
@@ -75,6 +119,18 @@ public class DatabaseController {
     public String delete(@PathVariable Long id) {
         databaseAdminService.delete(id);
         return "redirect:/databases";
+    }
+
+    @PostMapping("/{id}/backup")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource> backup(@PathVariable Long id) throws IOException {
+        DatabaseConnection connection = databaseAdminService.getRequired(id);
+        DatabaseBackupService.BackupArtifact artifact = backupService.backup(connection);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + artifact.fileName() + "\"")
+                .contentLength(artifact.path().toFile().length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(artifact.resource());
     }
 
     @GetMapping("/{id}/tables")
@@ -156,7 +212,7 @@ public class DatabaseController {
 
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     @GetMapping(value = "/{id}/tables/{tableName}/export", produces = "text/csv")
-    public org.springframework.http.ResponseEntity<byte[]> exportCsv(
+    public ResponseEntity<byte[]> exportCsv(
             @PathVariable Long id,
             @PathVariable String tableName,
             @RequestParam(value = "q", required = false) String query,
@@ -164,9 +220,9 @@ public class DatabaseController {
             @RequestParam(value = "dir", required = false) String direction
     ) {
         byte[] csv = crudService.exportCsv(id, tableName, query, sort, direction);
-        return org.springframework.http.ResponseEntity.ok()
-                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + tableName + ".csv\"")
-                .contentType(org.springframework.http.MediaType.parseMediaType("text/csv"))
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + tableName + ".csv\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
                 .body(csv);
     }
 

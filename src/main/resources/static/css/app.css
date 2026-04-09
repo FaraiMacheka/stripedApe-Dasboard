@@ -62,6 +62,24 @@ body.app-shell {
   background: linear-gradient(145deg, var(--primary), var(--primary-strong));
   color: #fff;
   box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.brand-mark-image {
+  padding: 0;
+  background: transparent;
+}
+
+.brand-mark img,
+.hero-logo,
+.brand-panel-logo {
+  display: block;
+  object-fit: cover;
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
 }
 
 .search-shell {
@@ -155,6 +173,22 @@ body.app-shell {
   gap: 0.35rem;
 }
 
+.brand-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 10%, var(--panel));
+}
+
+.brand-panel-logo {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+
 .content-shell {
   padding: 1.25rem 1.25rem 0 0;
 }
@@ -211,6 +245,69 @@ body.app-shell {
   gap: 0.5rem;
 }
 
+.dashboard-hero {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--primary) 16%, var(--panel)), var(--panel));
+}
+
+.hero-copy {
+  max-width: 700px;
+}
+
+.hero-logo {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+.port-notes {
+  min-width: 260px;
+}
+
+.port-card {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 5%, var(--panel)), var(--panel));
+}
+
+.port-chip {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  background: var(--panel-strong);
+}
+
+.port-chip-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.port-chip-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.port-details {
+  border-top: 1px solid var(--border);
+  padding-top: 0.9rem;
+}
+
+.port-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary-strong);
+  margin-bottom: 0.75rem;
+}
+
+.port-details[open] summary {
+  margin-bottom: 0.75rem;
+}
+
 .form-control,
 .form-select {
   background-color: var(--panel);
@@ -235,5 +332,9 @@ body.app-shell {
 
   .content-shell {
     padding: 1rem;
+  }
+
+  .hero-copy {
+    align-items: flex-start;
   }
 }

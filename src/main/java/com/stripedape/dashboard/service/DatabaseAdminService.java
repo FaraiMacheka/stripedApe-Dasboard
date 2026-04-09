@@ -3,7 +3,7 @@ package com.stripedape.dashboard.service;
 import com.stripedape.dashboard.config.AppProperties;
 import com.stripedape.dashboard.domain.DatabaseConnection;
 import com.stripedape.dashboard.repository.DatabaseConnectionRepository;
-import javax.annotation.PostConstruct;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class DatabaseAdminService {
         this.dynamicDataSourceRegistry = dynamicDataSourceRegistry;
     }
 
-    @PostConstruct
+    @javax.annotation.PostConstruct
     @Transactional
     public void seedConnections() {
         if (repository.count() > 0) {
@@ -42,6 +42,8 @@ public class DatabaseAdminService {
             connection.setUsername(seed.getUsername());
             connection.setEncryptedPassword(cryptoService.encrypt(seed.getPassword()));
             connection.setActive(seed.isActive());
+            connection.setAutoDiscovered(false);
+            connection.setLastSeenAt(Instant.now());
             repository.save(connection);
         }
     }
@@ -52,6 +54,10 @@ public class DatabaseAdminService {
 
     public List<DatabaseConnection> listActive() {
         return repository.findAllByActiveTrueOrderByNameAsc();
+    }
+
+    public List<DatabaseConnection> listAutoDiscovered() {
+        return repository.findAllByAutoDiscoveredTrueOrderByNameAsc();
     }
 
     public DatabaseConnection getRequired(Long id) {
@@ -72,9 +78,30 @@ public class DatabaseAdminService {
         }
         connection.setActive(form.isActive());
         connection.setDescription(form.getDescription());
+        connection.setAutoDiscovered(false);
+        connection.setLastSeenAt(Instant.now());
         DatabaseConnection saved = repository.save(connection);
         dynamicDataSourceRegistry.evict(saved.getId());
         return saved;
+    }
+
+    @Transactional
+    public DatabaseConnection saveDiscovered(DatabaseConnection connection) {
+        DatabaseConnection saved = repository.save(connection);
+        dynamicDataSourceRegistry.evict(saved.getId());
+        return saved;
+    }
+
+    @Transactional
+    public void markSeen(DatabaseConnection connection, Instant seenAt) {
+        connection.setLastSeenAt(seenAt);
+        repository.save(connection);
+    }
+
+    @Transactional
+    public void markBackedUp(DatabaseConnection connection, Instant backupAt) {
+        connection.setLastBackupAt(backupAt);
+        repository.save(connection);
     }
 
     @Transactional
@@ -101,5 +128,3 @@ public class DatabaseAdminService {
         return jdbcUrl;
     }
 }
-
-

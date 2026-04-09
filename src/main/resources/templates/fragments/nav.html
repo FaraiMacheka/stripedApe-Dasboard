@@ -4,7 +4,10 @@
 <header th:fragment="topbar" class="topbar navbar navbar-expand-lg border-bottom">
   <div class="container-fluid gap-3">
     <a class="brand" th:href="@{/dashboard}">
-      <span class="brand-mark">SA</span>
+      <span class="brand-mark brand-mark-image" th:if="${brandLogoUrl != null}">
+        <img th:src="${brandLogoUrl}" alt="stripedApe logo"/>
+      </span>
+      <span class="brand-mark" th:unless="${brandLogoUrl != null}">SA</span>
       <span th:text="${appName}">stripedApe-Dasboard</span>
     </a>
     <form class="flex-grow-1 d-none d-lg-flex search-shell" th:action="@{/search}" method="get">
@@ -37,12 +40,20 @@
 
 <aside th:fragment="sidebar" class="sidebar">
   <div class="sidebar-inner">
+    <div class="brand-panel mb-3" th:if="${brandLogoUrl != null}">
+      <img class="brand-panel-logo" th:src="${brandLogoUrl}" alt="stripedApe logo"/>
+      <div>
+        <div class="fw-semibold" th:text="${appName}">stripedApe-Dasboard</div>
+        <small class="text-muted">Digital Brand Agency</small>
+      </div>
+    </div>
     <nav class="nav flex-column gap-1">
-      <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-grid"></i><span>Dashboard</span></a>
-      <a class="nav-link" th:href="@{/databases}"><i class="bi bi-database"></i><span>Databases</span></a>
-      <a class="nav-link" th:href="@{/users}"><i class="bi bi-people"></i><span>Users</span></a>
-      <a class="nav-link" th:href="@{/search}"><i class="bi bi-search"></i><span>Reports / Analytics</span></a>
-      <a class="nav-link" th:href="@{/settings}"><i class="bi bi-gear"></i><span>Settings</span></a>
+      <a class="nav-link" th:classappend="${currentPath == '/dashboard' ? ' active' : ''}" th:href="@{/dashboard}"><i class="bi bi-grid"></i><span>Dashboard</span></a>
+      <a class="nav-link" th:classappend="${currentPath == '/app-ports' ? ' active' : ''}" th:href="@{/app-ports}"><i class="bi bi-diagram-3"></i><span>Application Ports</span></a>
+      <a class="nav-link" th:classappend="${#strings.startsWith(currentPath, '/databases') ? ' active' : ''}" th:href="@{/databases}"><i class="bi bi-database"></i><span>Databases</span></a>
+      <a class="nav-link" th:classappend="${#strings.startsWith(currentPath, '/users') ? ' active' : ''}" th:href="@{/users}"><i class="bi bi-people"></i><span>Users</span></a>
+      <a class="nav-link" th:classappend="${currentPath == '/search' ? ' active' : ''}" th:href="@{/search}"><i class="bi bi-search"></i><span>Reports / Analytics</span></a>
+      <a class="nav-link" th:classappend="${currentPath == '/settings' ? ' active' : ''}" th:href="@{/settings}"><i class="bi bi-gear"></i><span>Settings</span></a>
     </nav>
     <div class="sidebar-footer">
       <small>Version 0.1.0</small>

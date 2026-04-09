@@ -22,6 +22,16 @@ server:
 app:
   name: stripedApe-Dasboard
   encryption-key: stripedape-dev-key
+  branding:
+    logo-path: C:\Users\FaraiMacheka\Documents\email.png
+  dashboard:
+    app-ports-file: C:\app-ports\app-ports.md
+  discovery:
+    enabled: true
+    cron: 0 0 0/12 * * *
+  backup:
+    directory: ./backups
+    pg-dump-path: pg_dump
   bootstrap-users:
     admin-username: admin
     admin-password: Admin@1234!
@@ -50,4 +60,3 @@ app:
       username: postgres
       password: eX2j984qQSt837nfw
       active: true
-

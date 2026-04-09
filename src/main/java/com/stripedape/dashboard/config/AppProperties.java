@@ -11,6 +11,10 @@ public class AppProperties {
     private String encryptionKey = "stripedape-dev-key";
     private final List<SeedDatabase> seedDatabases = new ArrayList<>();
     private final BootstrapUser bootstrapUsers = new BootstrapUser();
+    private final Branding branding = new Branding();
+    private final Dashboard dashboard = new Dashboard();
+    private final Discovery discovery = new Discovery();
+    private final Backup backup = new Backup();
 
     public String getName() {
         return name;
@@ -34,6 +38,88 @@ public class AppProperties {
 
     public BootstrapUser getBootstrapUsers() {
         return bootstrapUsers;
+    }
+
+    public Branding getBranding() {
+        return branding;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
+    }
+
+    public Discovery getDiscovery() {
+        return discovery;
+    }
+
+    public Backup getBackup() {
+        return backup;
+    }
+
+    public static class Branding {
+        private String logoPath;
+
+        public String getLogoPath() {
+            return logoPath;
+        }
+
+        public void setLogoPath(String logoPath) {
+            this.logoPath = logoPath;
+        }
+    }
+
+    public static class Dashboard {
+        private String appPortsFile;
+
+        public String getAppPortsFile() {
+            return appPortsFile;
+        }
+
+        public void setAppPortsFile(String appPortsFile) {
+            this.appPortsFile = appPortsFile;
+        }
+    }
+
+    public static class Discovery {
+        private boolean enabled = true;
+        private String cron = "0 0 0/12 * * *";
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getCron() {
+            return cron;
+        }
+
+        public void setCron(String cron) {
+            this.cron = cron;
+        }
+    }
+
+    public static class Backup {
+        private String directory = "./backups";
+        private String pgDumpPath = "pg_dump";
+
+        public String getDirectory() {
+            return directory;
+        }
+
+        public void setDirectory(String directory) {
+            this.directory = directory;
+        }
+
+        public String getPgDumpPath() {
+            return pgDumpPath;
+        }
+
+        public void setPgDumpPath(String pgDumpPath) {
+            this.pgDumpPath = pgDumpPath;
+        }
     }
 
     public static class SeedDatabase {
@@ -141,4 +227,3 @@ public class AppProperties {
         }
     }
 }
-

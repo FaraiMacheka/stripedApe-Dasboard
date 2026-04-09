@@ -1,12 +1,12 @@
 package com.stripedape.dashboard.domain;
 
+import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.Instant;
 
 @Entity
 @Table(name = "database_connections")
@@ -31,11 +31,20 @@ public class DatabaseConnection {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(nullable = false)
+    private boolean autoDiscovered = false;
+
     @Column(length = 400)
     private String description;
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
+
+    @Column
+    private Instant lastSeenAt;
+
+    @Column
+    private Instant lastBackupAt;
 
     public Long getId() {
         return id;
@@ -81,6 +90,14 @@ public class DatabaseConnection {
         this.active = active;
     }
 
+    public boolean isAutoDiscovered() {
+        return autoDiscovered;
+    }
+
+    public void setAutoDiscovered(boolean autoDiscovered) {
+        this.autoDiscovered = autoDiscovered;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -96,5 +113,20 @@ public class DatabaseConnection {
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
-}
 
+    public Instant getLastSeenAt() {
+        return lastSeenAt;
+    }
+
+    public void setLastSeenAt(Instant lastSeenAt) {
+        this.lastSeenAt = lastSeenAt;
+    }
+
+    public Instant getLastBackupAt() {
+        return lastBackupAt;
+    }
+
+    public void setLastBackupAt(Instant lastBackupAt) {
+        this.lastBackupAt = lastBackupAt;
+    }
+}
